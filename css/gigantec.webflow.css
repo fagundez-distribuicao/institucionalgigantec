@@ -1098,6 +1098,8 @@ figcaption {
   border-width: 2px;
   border-color: var(--_primitives---colors--green-yellow);
   background-color: var(--_primitives---colors--white);
+
+  color: #000;
 }
 
 .rl-styleguide_button-list {
