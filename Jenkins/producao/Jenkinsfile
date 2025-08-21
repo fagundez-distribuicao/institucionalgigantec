@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+    environment {
+        // Variável que define as credenciais (ID Credencial - configurada no painel do Jenkins)
+        GIT_CREDENTIALS = 'GitHub-fagundez-distribuicao'
+        SSH_CREDENTIALS = 'ssh-jenkins-server'
+        DOCKER_SITE_ROOT = '/usr/share/nginx/html/localhost/projetos/gigantec_institucional'
+        //GIGANTEC_PRODUCAO_SERVER = '192.168.18.20' // roteamento pela fagundez para acesso a vpn da mps '200.160.25.194'
+        FAGUNDEZ_SERVER = '192.168.90.200' // EVEO IP INTERNO 192.168.90.200 | EVEO IP EXTERNO 177.136.251.156
+        //FAGUNDEZ_SERVER_VPN = '192.168.18.29' // Acesso para 192.168.90.200 alternando entre a VPN da MPS e EVEO
+        //GIGANTEC_PRODUCAO_SERVER_MYSQL = 'maluf_mysql_8.0.37'
+        FAGUNDEZ_SERVER_PHP = 'fagundez_php_5.6'
+        //FAGUNDEZ_SERVER_MYSQL = 'magento_fagundez_mysql_8.0.37'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo '⬇️ Baixando alterações do GitHub...'
+                git credentialsId: "${GIT_CREDENTIALS}", url: 'git@github.com:fagundez-distribuicao/institucionalgigantec.git', branch: 'main'
+            }
+        }
+
+        stage('Preparation') {
+            steps {
+                echo '↔️ Copiando arquivos para destino correto... /var/html/localhost/projetos/gigantec_institucional'
+                sh 'sudo cp -Rf . /var/html/localhost/projetos/gigantec_institucional'
+                sh 'sudo rm -Rf ./* .[^.]*[!.]*'
+
+                echo '🛠️ Ajuste permissões em pastas'
+                script {
+                    sshagent(["${SSH_CREDENTIALS}"]) {
+
+                        // # Definir permissões para arquivos(644) e diretórios(755)
+                        // find . -type d -exec chmod 755 {} \;
+                        // find . -type f -exec chmod 644 {} \;
+                        // Exceções /bin/magento - arquivo deve ser 755
+
+                        // Redefine permissões nos arquivos e diretórios
+                        sh 'ssh -o StrictHostKeyChecking=no debian@${FAGUNDEZ_SERVER} "docker exec -uroot ${FAGUNDEZ_SERVER_PHP} find ${DOCKER_SITE_ROOT} -type d -exec chmod 755 {} \\;"'
+                        sh 'ssh -o StrictHostKeyChecking=no debian@${FAGUNDEZ_SERVER} "docker exec -uroot ${FAGUNDEZ_SERVER_PHP} find ${DOCKER_SITE_ROOT} -type f -exec chmod 644 {} \\;"'
+                        
+                        // # Alterar o proprietário e grupo para www-data 
+                        sh 'ssh -o StrictHostKeyChecking=no debian@${FAGUNDEZ_SERVER} "docker exec -uroot ${FAGUNDEZ_SERVER_PHP} chown www-data:www-data -Rf ${DOCKER_SITE_ROOT}"'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Pipeline executado com sucesso!'
+        }
+        failure {
+            echo '🚨 O pipeline falhou!'
+        }
+    }
+}
