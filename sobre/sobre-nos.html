@@ -28,6 +28,30 @@
     gtag('config', 'G-RMM2HSQZYW');
   </script>
   <!-- Google tag (gtag.js) -->
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const iframe = document.getElementById('youtube-player');
+    let autoplayed = false;
+
+    if ('IntersectionObserver' in window && iframe) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !autoplayed) {
+            let src = iframe.getAttribute('src');
+            if (!src.includes('&autoplay=1&mute=0')) {
+              src += (src.includes('?') ? '&' : '?') + '&autoplay=1&mute=0';
+              iframe.setAttribute('src', src);
+              autoplayed = true;
+            }
+          }
+        });
+      }, { threshold: 0.5 }); // 50% visível
+
+      observer.observe(iframe);
+    }
+  });
+</script>
   <style>
   * {
   -webkit-font-smoothing: antialiased;
@@ -244,6 +268,10 @@ margin: 0rem !important;
 .w-slider-nav-invert .w-slider-dot.w-active {
   background-color: var(--color-scheme-1--text) !important;
   opacity: 1 !important;
+}
+
+.youtube-video-container{
+  padding-bottom: 3rem;
 }
 
 .youtube-video-player {
@@ -542,8 +570,8 @@ margin: 0rem !important;
                 </div>
               </div>
             </div>
-            <div class="padding-section-medium">
-              <iframe class="youtube-video-player" src="https://www.youtube.com/embed/hgRAI1thFHM" title="A tecnologia que você e sua empresa precisam está na Gigantec" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen allow></iframe>
+            <div class="youtube-video-container">
+              <iframe id="youtube-player" class="youtube-video-player" src="https://www.youtube.com/embed/hgRAI1thFHM" title="A tecnologia que você e sua empresa precisam está na Gigantec" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </div>
           </div>
         </div>
