@@ -6,7 +6,8 @@ pipeline {
         SSH_CREDENTIALS = 'ssh-jenkins-server'
         DOCKER_SITE_ROOT = '/usr/share/nginx/html/localhost/projetos/gigantec_institucional'
         //GIGANTEC_PRODUCAO_SERVER = '192.168.18.20' // roteamento pela fagundez para acesso a vpn da mps '200.160.25.194'
-        FAGUNDEZ_SERVER = '192.168.90.200' // EVEO IP INTERNO 192.168.90.200 | EVEO IP EXTERNO 177.136.251.156
+        //FAGUNDEZ_SERVER = '192.168.90.200' // EVEO IP INTERNO 192.168.90.200 | EVEO IP EXTERNO 177.136.251.156
+        FAGUNDEZ_SERVER = '192.168.90.30' // EVEO IP INTERNO 192.168.90.30 | EVEO IP EXTERNO 186.209.116.147
         //FAGUNDEZ_SERVER_VPN = '192.168.18.29' // Acesso para 192.168.90.200 alternando entre a VPN da MPS e EVEO
         //GIGANTEC_PRODUCAO_SERVER_MYSQL = 'maluf_mysql_8.0.37'
         FAGUNDEZ_SERVER_PHP = 'fagundez_php_5.6'
